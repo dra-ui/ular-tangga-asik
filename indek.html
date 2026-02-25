@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>🐻 Ular Tangga Modern (3:4) 🐰</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(145deg, #fbc1cb 0%, #ffb3c6 100%);
+            font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TOMBOL RESET ===== */
+        #resetBtn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            font-size: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1), 0 0 20px rgba(255, 255, 255, 0.5);
+            transition: 0.2s;
+            color: #7f4f5a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
+        }
+
+        #resetBtn:hover {
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 0 30px white;
+        }
+
+        /* ===== KANVAS PAPAN ===== */
+        .board-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px 20px;
+            background: transparent;
+            min-height: 0;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: min(95vh, 95vw);
+            background: #ffeef2;
+            touch-action: none;
+            border-radius: 40px;
+            box-shadow: 0 30px 50px -15px rgba(255, 80, 120, 0.5), 0 0 0 3px rgba(255, 255, 255, 0.8) inset, 0 0 30px #ffb3c6;
+            aspect-ratio: 3 / 4;
+        }
+
+        /* ===== FOOTER (PEMAIN & DADU) ===== */
+        .footer {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            padding: 18px 24px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            border-top: 2px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 -10px 30px -5px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .footer-col {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid white;
+            border-radius: 40px;
+            padding: 16px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px -5px rgba(255, 100, 130, 0.3);
+            transition: all 0.2s;
+        }
+
+        .footer-col.active {
+            border: 3px solid white;
+            box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.5), 0 10px 30px -5px #ff99aa;
+            transform: translateY(-2px);
+        }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .player-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.6rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            border: 3px solid white;
+            box-shadow: 0 5px 15px rgba(255, 140, 160, 0.4);
+        }
+
+        .player-position {
+            font-size: 2rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            padding: 8px 20px;
+            border-radius: 40px;
+            border: 2px solid white;
+            color: #7f4f5a;
+            min-width: 80px;
+            text-align: center;
+            box-shadow: 0 5px 10px rgba(255, 100, 120, 0.2);
+        }
+
+        .dice-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        #diceBtn {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 3px solid white;
+            font-size: 3.6rem;
+            width: 100px;
+            height: 100px;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 15px 30px -8px rgba(255, 80, 120, 0.6), 0 0 0 3px rgba(255, 255, 255, 0.8) inset;
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f4f5a;
+        }
+
+        #diceBtn:active {
+            transform: translateY(5px);
+            box-shadow: 0 8px 20px -5px #ff99aa;
+        }
+
+        #diceBtn:disabled {
+            opacity: 0.5;
+            transform: translateY(2px);
+        }
+
+        #message {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #7f4f5a;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(4px);
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: 2px solid white;
+            white-space: nowrap;
+            box-shadow: 0 5px 15px -5px #ffb6c1;
+        }
+
+        /* ===== POPUP CHALLENGE ===== */
+        .popup-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 200, 215, 0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .popup-content {
+            background: rgba(255, 240, 245, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 40px 50px;
+            border-radius: 100px;
+            border: 3px solid white;
+            box-shadow: 0 30px 60px -15px #ff99aa, 0 0 40px white;
+            text-align: center;
+            max-width: 85%;
+            transform: scale(0.8) rotate(-1deg);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .popup-overlay.active .popup-content {
+            transform: scale(1) rotate(0deg);
+        }
+
+        .popup-photo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 10px 20px -5px #ff99aa;
+            background: #fff0f5;
+            object-fit: cover;
+        }
+
+        .popup-content p {
+            font-size: 2.2rem;
+            margin: 20px 0 10px;
+            color: #7f4f5a;
+            font-weight: 500;
+        }
+
+        /* ===== RESPONSIVE (LAYAR KECIL) ===== */
+        @media (max-width: 480px) {
+            .footer {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .player-badge {
+                width: 50px;
+                height: 50px;
+                font-size: 2.2rem;
+            }
+
+            .player-position {
+                font-size: 1.5rem;
+                padding: 5px 12px;
+                min-width: 60px;
+            }
+
+            #diceBtn {
+                width: 75px;
+                height: 75px;
+                font-size: 2.8rem;
+            }
+
+            #resetBtn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.8rem;
+                top: 12px;
+                right: 12px;
+            }
+
+            .popup-content {
+                padding: 20px 25px;
+            }
+
+            .popup-photo img {
+                width: 60px;
+                height: 60px;
+            }
+
+            .popup-content p {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button id="resetBtn">🔄</button>
+
+    <div class="board-container">
+        <canvas id="boardCanvas" width="600" height="800"></canvas>
+    </div>
+
+    <div class="footer">
+        <div class="footer-col" id="colPlayer1">
+            <div class="player-info">
+                <span class="player-badge">🐻</span>
+                <span class="player-position" id="player1Pos">1</span>
+            </div>
+        </div>
+        <div class="footer-col" id="colDice">
+            <div class="dice-area">
+                <button id="diceBtn">🎲</button>
+                <div id="message">Klik dadu</div>
+            </div>
+        </div>
+        <div class="footer-col" id="colPlayer2">
+            <div class="player-info">
+                <span class="player-badge">🐰</span>
+                <span class="player-position" id="player2Pos">1</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popup">
+        <div class="popup-content">
+            <div class="popup-photo">
+                <img id="challengeImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4d6d'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E" alt="Challenge icon">
+            </div>
+            <p id="popupText">Kamu harus...</p>
+        </div>
+    </div>
+
+    <script>
+        // ===== INISIALISASI GAME =====
+        (function() {
+            const canvas = document.getElementById('boardCanvas');
+            const ctx = canvas.getContext('2d');
+            const boardWidth = 600;
+            const boardHeight = 800;
+            canvas.width = boardWidth;
+            canvas.height = boardHeight;
+
+            const cellWidth = boardWidth / 10;   // 60
+            const cellHeight = boardHeight / 10;  // 80
+
+            const PLAYER_COUNT = 2;
+            let players = [1, 1];                // Posisi pemain (indeks 0 = beruang, 1 = kelinci)
+            let currentPlayer = 0;                // Giliran pemain (0 atau 1)
+            let gameOver = false;
+            let diceValue = 0;
+            let lastDiceValue = 0;
+
+            // Data ular dan tangga
+            const snakes = [
+                [16, 6], [47, 26], [49, 11], [62, 19],
+                [64, 60], [85, 24], [93, 73], [95, 32], [98, 78],
+                [38, 1]
+            ];
+            const ladders = [
+                [4, 14], [9, 31], [21, 42], [28, 84],
+                [36, 44], [51, 67], [71, 91], [80, 100]
+            ];
+
+            // Daftar challenge (bisa diperluas)
+            const challengeList = [
+                { text: "Ciuman 1 menit!", effect: (p) => p },
+                { text: "Remas susu 1 menit!", effect: (p) => p },
+                { text: "Coliin 2 menit!", effect: (p) => p },
+                { text: "Colmekin 2 menit!", effect: (p) => p },
+                { text: "3 menit", effect: (p) => p, image: "./c1.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c2.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c3.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c4.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c5.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c6.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c7.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c8.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c9.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c10.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c11.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c12.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c13.jpg" },
+                { text: "5 menit", effect: (p) => p, image: "./c14.jpg" },
+                { text: "3menit", effect: (p) => p, image: "./c15.jpg" },
+                { text: "3 menit", effect: (p) => p, image: "./c16.jpg" }
+            ];
+
+            let challengeSquares = new Map();      // Map nomor petak -> challenge
+
+            // ===== GENERATE CHALLENGE =====
+            function generateChallenges(count = 20) {
+                let used = new Set();
+                snakes.forEach(s => { used.add(s[0]); used.add(s[1]); });
+                ladders.forEach(l => { used.add(l[0]); used.add(l[1]); });
+                used.add(1); used.add(100);        // Petak awal & akhir tidak boleh challenge
+
+                let available = [];
+                for (let i = 2; i <= 99; i++) {
+                    if (!used.has(i)) available.push(i);
+                }
+
+                // Acak urutan
+                for (let i = available.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [available[i], available[j]] = [available[j], available[i]];
+                }
+
+                let selected = [];
+                for (let num of available) {
+                    if (selected.length >= count) break;
+                    selected.push(num);
+                }
+
+                // Jika kurang, tambah secara acak
+                while (selected.length < count) {
+                    let num = Math.floor(Math.random() * 98) + 2;
+                    if (!used.has(num) && !selected.includes(num)) selected.push(num);
+                }
+
+                selected.forEach(sq => {
+                    let challenge = challengeList[Math.floor(Math.random() * challengeList.length)];
+                    challengeSquares.set(sq, challenge);
+                });
+            }
+            generateChallenges(20);
+
+            // ===== ANIMASI =====
+            let stepAnim = { active: false, interval: null, playerId: null, from: null, to: null, step: null, current: null, onComplete: null };
+            let lineAnim = { active: false, playerId: null, fromPos: { x: 0, y: 0 }, toPos: { x: 0, y: 0 }, startTime: null, duration: 600, currentX: 0, currentY: 0, onComplete: null };
+
+            // ===== AUDIO (Web Audio API) =====
+            let audioCtx = null;
+            function initAudio() {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            function playTick() {
+                try {
+                    initAudio();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.value = 800;
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } catch (e) { /* abaikan jika gagal */ }
+            }
+
+            function playWhoosh() {
+                try {
+                    initAudio();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } catch (e) { }
+            }
+
+            function playPop() {
+                try {
+                    initAudio();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = 600;
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } catch (e) { }
+            }
+
+            // ===== FUNGSI BANTU =====
+            function getRowCol(square) {
+                const row = Math.floor((square - 1) / 10);
+                const colRaw = (square - 1) % 10;
+                const col = (row % 2 === 0) ? colRaw : (9 - colRaw);
+                return { row, col };
+            }
+
+            function getCenterFromSquare(square) {
+                const { row, col } = getRowCol(square);
+                const y = (9 - row) * cellHeight + cellHeight / 2;
+                const x = col * cellWidth + cellWidth / 2;
+                return { x, y };
+            }
+
+            function checkSnakesAndLadders(square) {
+                for (let [from, to] of snakes) if (from === square) return to;
+                for (let [from, to] of ladders) if (from === square) return to;
+                return square;
+            }
+
+            // ===== GAMBAR KARAKTER =====
+            function drawBear(ctx, cx, cy, size = 20) {
+                // Badan
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, size * 0.8, size * 0.8, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#d2696a';
+                ctx.fill();
+                ctx.strokeStyle = '#8b4c4d';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Telinga
+                ctx.beginPath();
+                ctx.ellipse(cx - size * 0.5, cy - size * 0.7, size * 0.4, size * 0.4, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#d2696a';
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.ellipse(cx + size * 0.5, cy - size * 0.7, size * 0.4, size * 0.4, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#d2696a';
+                ctx.fill();
+                ctx.stroke();
+
+                // Moncong
+                ctx.beginPath();
+                ctx.ellipse(cx, cy + size * 0.2, size * 0.3, size * 0.2, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#f0b6b6';
+                ctx.fill();
+                ctx.strokeStyle = '#8b4c4d';
+                ctx.stroke();
+
+                // Mata
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(cx - size * 0.3, cy - size * 0.2, size * 0.12, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(cx + size * 0.3, cy - size * 0.2, size * 0.12, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Hidung
+                ctx.fillStyle = '#5a2e2e';
+                ctx.beginPath();
+                ctx.arc(cx, cy + size * 0.15, size * 0.1, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            function drawBunny(ctx, cx, cy, size = 20) {
+                // Kepala
+                ctx.beginPath();
+                ctx.ellipse(cx, cy, size * 0.8, size * 0.8, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#f9b8c4';
+                ctx.fill();
+                ctx.strokeStyle = '#b34e5e';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Telinga
+                ctx.beginPath();
+                ctx.ellipse(cx - size * 0.4, cy - size * 1.0, size * 0.3, size * 0.8, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#f9b8c4';
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.ellipse(cx + size * 0.4, cy - size * 1.0, size * 0.3, size * 0.8, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#f9b8c4';
+                ctx.fill();
+                ctx.stroke();
+
+                // Dalam telinga
+                ctx.fillStyle = '#ffd1dc';
+                ctx.beginPath();
+                ctx.ellipse(cx - size * 0.4, cy - size * 1.0, size * 0.18, size * 0.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(cx + size * 0.4, cy - size * 1.0, size * 0.18, size * 0.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Mata
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(cx - size * 0.3, cy - size * 0.2, size * 0.12, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(cx + size * 0.3, cy - size * 0.2, size * 0.12, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Hidung
+                ctx.fillStyle = '#ff8da1';
+                ctx.beginPath();
+                ctx.arc(cx, cy + size * 0.1, size * 0.1, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Kumis
+                ctx.beginPath();
+                ctx.strokeStyle = '#b34e5e';
+                ctx.lineWidth = 1.5;
+                ctx.moveTo(cx - size * 0.15, cy + size * 0.05);
+                ctx.lineTo(cx - size * 0.4, cy + size * 0.15);
+                ctx.moveTo(cx - size * 0.15, cy + size * 0.1);
+                ctx.lineTo(cx - size * 0.4, cy + size * 0.25);
+                ctx.moveTo(cx + size * 0.15, cy + size * 0.05);
+                ctx.lineTo(cx + size * 0.4, cy + size * 0.15);
+                ctx.moveTo(cx + size * 0.15, cy + size * 0.1);
+                ctx.lineTo(cx + size * 0.4, cy + size * 0.25);
+                ctx.stroke();
+            }
+
+            // ===== GAMBAR PAPAN =====
+            function drawBoard() {
+                ctx.clearRect(0, 0, boardWidth, boardHeight);
+
+                // Gambar petak
+                for (let row = 0; row < 10; row++) {
+                    for (let col = 0; col < 10; col++) {
+                        let x = col * cellWidth;
+                        let y = (9 - row) * cellHeight;
+                        let gradient = ctx.createLinearGradient(x, y, x + cellWidth, y + cellHeight);
+                        if ((row + col) % 2 === 0) {
+                            gradient.addColorStop(0, '#fff7fa');
+                            gradient.addColorStop(1, '#ffeef2');
+                        } else {
+                            gradient.addColorStop(0, '#ffeef2');
+                            gradient.addColorStop(1, '#ffe2e8');
+                        }
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(x, y, cellWidth - 1, cellHeight - 1);
+                        ctx.strokeStyle = '#ffb7c5';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, cellWidth, cellHeight);
+
+                        // Nomor petak
+                        let number;
+                        if (row % 2 === 0) number = row * 10 + col + 1;
+                        else number = row * 10 + (9 - col) + 1;
+
+                        // Tandai challenge
+                        if (challengeSquares.has(number)) {
+                            ctx.shadowColor = '#ffb3c6';
+                            ctx.shadowBlur = 15;
+                            ctx.fillStyle = 'rgba(255, 220, 240, 0.6)';
+                            ctx.fillRect(x + 2, y + 2, cellWidth - 4, cellHeight - 4);
+                            ctx.shadowBlur = 0;
+                            ctx.font = 'bold 32px "Poppins", "Segoe UI"';
+                            ctx.fillStyle = '#b34e6b';
+                            ctx.shadowColor = 'white';
+                            ctx.shadowBlur = 10;
+                            ctx.fillText('✨', x + cellWidth / 2 - 20, y + cellHeight / 2 + 12);
+                            ctx.shadowBlur = 0;
+                        }
+
+                        ctx.font = '600 22px "Poppins", "Arial"';
+                        ctx.fillStyle = '#9d6170';
+                        ctx.fillText(number, x + 12, y + 45);
+                    }
+                }
+
+                // Gambar tangga
+                ladders.forEach(([from, to]) => {
+                    const fromPos = getCenterFromSquare(from);
+                    const toPos = getCenterFromSquare(to);
+                    const angle = Math.atan2(toPos.y - fromPos.y, toPos.x - fromPos.x);
+                    const distance = Math.hypot(toPos.x - fromPos.x, toPos.y - fromPos.y);
+                    const midX = (fromPos.x + toPos.x) / 2;
+                    const midY = (fromPos.y + toPos.y) / 2;
+
+                    ctx.save();
+                    ctx.translate(midX, midY);
+                    ctx.rotate(angle);
+                    ctx.shadowColor = '#ffb7c5';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                    ctx.fillStyle = '#ffccd9';
+                    ctx.fillRect(-distance / 2, -14, distance, 10);
+                    ctx.fillStyle = '#ffb3c1';
+                    ctx.fillRect(-distance / 2, 4, distance, 10);
+                    ctx.fillStyle = 'white';
+                    for (let i = -distance / 2 + 20; i < distance / 2; i += 35) {
+                        ctx.fillRect(i - 5, -24, 10, 38);
+                    }
+                    ctx.restore();
+                });
+
+                // Gambar ular (biru)
+                snakes.forEach(([from, to]) => {
+                    const fromPos = getCenterFromSquare(from);
+                    const toPos = getCenterFromSquare(to);
+                    const dx = toPos.x - fromPos.x;
+                    const dy = toPos.y - fromPos.y;
+                    const angle = Math.atan2(dy, dx);
+
+                    ctx.save();
+                    ctx.shadowColor = '#6ab0de';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowOffsetX = 4;
+                    ctx.shadowOffsetY = 4;
+
+                    // Kurva Bezier
+                    ctx.beginPath();
+                    const cp1x = fromPos.x + dx * 0.3 + dy * 0.2;
+                    const cp1y = fromPos.y + dy * 0.3 - dx * 0.2;
+                    const cp2x = fromPos.x + dx * 0.7 - dy * 0.2;
+                    const cp2y = fromPos.y + dy * 0.7 + dx * 0.2;
+                    ctx.moveTo(fromPos.x, fromPos.y);
+                    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, toPos.x, toPos.y);
+                    const gradient = ctx.createLinearGradient(fromPos.x, fromPos.y, toPos.x, toPos.y);
+                    gradient.addColorStop(0, '#7ec8e0');
+                    gradient.addColorStop(1, '#4a90e2');
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = 24;
+                    ctx.stroke();
+
+                    // Garis putus-putus putih
+                    ctx.save();
+                    ctx.shadowBlur = 0;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 3;
+                    ctx.setLineDash([12, 18]);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Kepala ular
+                    ctx.save();
+                    ctx.translate(toPos.x, toPos.y);
+                    ctx.rotate(angle);
+                    ctx.fillStyle = '#4a90e2';
+                    ctx.beginPath();
+                    ctx.ellipse(14, 0, 16, 12, 0, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.fillStyle = 'white';
+                    ctx.beginPath(); ctx.arc(20, -6, 4, 0, 2 * Math.PI); ctx.fill();
+                    ctx.beginPath(); ctx.arc(20, 6, 4, 0, 2 * Math.PI); ctx.fill();
+                    ctx.fillStyle = '#1f3a6b';
+                    ctx.beginPath(); ctx.arc(21, -6, 2, 0, 2 * Math.PI); ctx.fill();
+                    ctx.beginPath(); ctx.arc(21, 6, 2, 0, 2 * Math.PI); ctx.fill();
+                    ctx.strokeStyle = '#ff4d6d';
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath(); ctx.moveTo(28, -4); ctx.lineTo(36, -9); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(28, 4); ctx.lineTo(36, 9); ctx.stroke();
+                    ctx.restore();
+
+                    // Ekor ular
+                    ctx.save();
+                    ctx.translate(fromPos.x, fromPos.y);
+                    ctx.rotate(angle + Math.PI);
+                    ctx.fillStyle = '#7ec8e0';
+                    ctx.beginPath();
+                    ctx.ellipse(-10, 0, 12, 7, 0, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.restore();
+
+                    ctx.restore();
+                });
+
+                // Gambar pemain (kecuali yang sedang dianimasi line)
+                const markers = [];
+                for (let i = 0; i < PLAYER_COUNT; i++) {
+                    if (lineAnim.active && lineAnim.playerId === i) continue;
+                    if (gameOver && players[i] === 100 && i !== currentPlayer) continue;
+                    const pos = players[i];
+                    const { x, y } = getCenterFromSquare(pos);
+                    markers.push({ x, y, playerId: i });
+                }
+
+                // Urutkan agar gambar tidak bertumpuk
+                markers.sort((a, b) => (a.x + a.y) - (b.x + b.y));
+
+                // Hitung jumlah pemain di posisi yang sama
+                const posCount = new Map();
+                markers.forEach(m => {
+                    const key = `${m.x},${m.y}`;
+                    posCount.set(key, (posCount.get(key) || 0) + 1);
+                });
+
+                // Gambar masing-masing pemain dengan offset melingkar
+                markers.forEach(m => {
+                    const key = `${m.x},${m.y}`;
+                    const total = posCount.get(key);
+                    const index = markers.filter(p => `${p.x},${p.y}` === key).findIndex(p => p.playerId === m.playerId);
+                    const angle = (index / total) * 2 * Math.PI;
+                    const offsetRadius = 22;
+                    const offsetX = Math.cos(angle) * offsetRadius;
+                    const offsetY = Math.sin(angle) * offsetRadius;
+                    const x = m.x + offsetX;
+                    const y = m.y + offsetY;
+
+                    ctx.shadowColor = (m.playerId === currentPlayer && !gameOver) ? 'white' : '#ffb7c5';
+                    ctx.shadowBlur = (m.playerId === currentPlayer && !gameOver) ? 35 : 20;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+
+                    if (m.playerId === 0) drawBear(ctx, x, y, 18);
+                    else drawBunny(ctx, x, y, 18);
+                });
+
+                // Gambar pemain yang sedang dianimasi line
+                if (lineAnim.active) {
+                    const { playerId, currentX, currentY } = lineAnim;
+                    ctx.shadowColor = (playerId === currentPlayer) ? 'white' : '#ffb7c5';
+                    ctx.shadowBlur = 30;
+                    if (playerId === 0) drawBear(ctx, currentX, currentY, 18);
+                    else drawBunny(ctx, currentX, currentY, 18);
+                }
+
+                ctx.shadowColor = 'transparent';
+            }
+
+            // ===== ANIMASI LANGKAH (STEP) =====
+            function startStepAnimation(playerIdx, from, to, onComplete) {
+                if (stepAnim.active || lineAnim.active) return;
+                const step = (to > from) ? 1 : -1;
+                let current = from;
+                stepAnim.active = true;
+                stepAnim.playerId = playerIdx;
+                stepAnim.from = from;
+                stepAnim.to = to;
+                stepAnim.step = step;
+                stepAnim.current = from;
+                stepAnim.onComplete = onComplete;
+                document.getElementById('diceBtn').disabled = true;
+
+                stepAnim.interval = setInterval(() => {
+                    current += step;
+                    if ((step > 0 && current > to) || (step < 0 && current < to)) current = to;
+                    players[playerIdx] = current;
+                    drawBoard();
+                    updatePosDisplay();
+                    playTick();
+
+                    if (current === to) {
+                        clearInterval(stepAnim.interval);
+                        stepAnim.interval = null;
+                        stepAnim.active = false;
+                        if (stepAnim.onComplete) stepAnim.onComplete();
+                    }
+                }, 200);
+            }
+
+            // ===== ANIMASI GARIS LURUS (LINE) =====
+            function startLineAnimation(playerIdx, fromSquare, toSquare, onComplete) {
+                if (lineAnim.active || stepAnim.active) return;
+                const fromPos = getCenterFromSquare(fromSquare);
+                const toPos = getCenterFromSquare(toSquare);
+                lineAnim.active = true;
+                lineAnim.playerId = playerIdx;
+                lineAnim.fromPos = fromPos;
+                lineAnim.toPos = toPos;
+                lineAnim.startTime = performance.now();
+                lineAnim.duration = 600;
+                lineAnim.currentX = fromPos.x;
+                lineAnim.currentY = fromPos.y;
+                lineAnim.onComplete = onComplete;
+                document.getElementById('diceBtn').disabled = true;
+                playWhoosh();
+
+                function animateLine(now) {
+                    if (!lineAnim.active) return;
+                    const elapsed = now - lineAnim.startTime;
+                    let progress = Math.min(elapsed / lineAnim.duration, 1);
+                    progress = Math.sin(progress * Math.PI / 2); // easing
+                    lineAnim.currentX = lineAnim.fromPos.x + (lineAnim.toPos.x - lineAnim.fromPos.x) * progress;
+                    lineAnim.currentY = lineAnim.fromPos.y + (lineAnim.toPos.y - lineAnim.fromPos.y) * progress;
+                    drawBoard();
+
+                    if (progress >= 1) {
+                        players[playerIdx] = toSquare;
+                        lineAnim.active = false;
+                        drawBoard();
+                        updatePosDisplay();
+                        if (lineAnim.onComplete) lineAnim.onComplete();
+                    } else {
+                        requestAnimationFrame(animateLine);
+                    }
+                }
+                requestAnimationFrame(animateLine);
+            }
+
+            function stopAllAnimations() {
+                if (stepAnim.interval) {
+                    clearInterval(stepAnim.interval);
+                    stepAnim.interval = null;
+                }
+                stepAnim.active = false;
+                lineAnim.active = false;
+            }
+
+            // ===== UPDATE TAMPILAN POSISI =====
+            function updatePosDisplay() {
+                document.getElementById('player1Pos').innerText = players[0];
+                document.getElementById('player2Pos').innerText = players[1];
+                document.getElementById('colPlayer1').classList.toggle('active', currentPlayer === 0 && !gameOver);
+                document.getElementById('colPlayer2').classList.toggle('active', currentPlayer === 1 && !gameOver);
+            }
+
+            // ===== POPUP CHALLENGE =====
+            const popup = document.getElementById('popup');
+            const popupText = document.getElementById('popupText');
+            const challengeImage = document.getElementById('challengeImage');
+            const defaultImageSrc = challengeImage.src;
+
+            challengeImage.onerror = function() {
+                this.src = defaultImageSrc;
+            };
+
+            let pendingChallenge = null;
+            let pendingPlayer = null;
+            let pendingSquare = null;
+
+            popup.addEventListener('click', function() {
+                if (popup.classList.contains('active')) {
+                    popup.classList.remove('active');
+                    if (pendingChallenge) {
+                        if (pendingChallenge.effect) pendingChallenge.effect(pendingSquare);
+                        afterLanding(pendingPlayer, pendingSquare, true);
+                        pendingChallenge = null;
+                    }
+                    // Pastikan tidak ada animasi yang tersisa
+                    stopAllAnimations();
+                    // Dadu akan diaktifkan oleh afterLanding, jadi tidak perlu di sini
+                }
+            });
+
+            // ===== SETELAH MENDARAT DI PETAK =====
+            function afterLanding(playerIdx, square, skipChallenge = false) {
+                // Cek menang
+                if (square === 100) {
+                    gameOver = true;
+                    document.getElementById('message').innerText = `🎉 Pemain ${playerIdx + 1} MENANG! 🎉`;
+                    document.getElementById('diceBtn').disabled = true;
+                    drawBoard();
+                    updatePosDisplay();
+                    return;
+                }
+
+                // Challenge jika ada
+                if (!skipChallenge && challengeSquares.has(square)) {
+                    // Nonaktifkan dadu saat popup muncul
+                    document.getElementById('diceBtn').disabled = true;
+                    let challenge = challengeSquares.get(square);
+                    popupText.innerText = `"${challenge.text}"`;
+                    if (challenge.image) {
+                        challengeImage.src = challenge.image + "?t=" + Date.now();
+                    } else {
+                        challengeImage.src = defaultImageSrc;
+                    }
+                    popup.classList.add('active');
+                    playPop();
+                    pendingChallenge = challenge;
+                    pendingPlayer = playerIdx;
+                    pendingSquare = square;
+                    return;
+                }
+
+                // Logika giliran (hanya bergantung pada dadu 6)
+                if (lastDiceValue === 6) {
+                    document.getElementById('message').innerText = `Pemain ${playerIdx + 1} dapat 6, lempar lagi!`;
+                } else {
+                    currentPlayer = (currentPlayer + 1) % PLAYER_COUNT;
+                }
+
+                updateUI();
+                document.getElementById('diceBtn').disabled = false;
+                document.getElementById('diceBtn').innerText = '🎲';
+                updatePosDisplay();
+            }
+
+            // ===== CEK ULAR/TANGGA =====
+            function handleSnakeOrLadder(playerIdx, pos) {
+                const newPos = checkSnakesAndLadders(pos);
+                if (newPos !== pos) {
+                    startLineAnimation(playerIdx, pos, newPos, () => { afterLanding(playerIdx, newPos); });
+                } else {
+                    afterLanding(playerIdx, pos);
+                }
+            }
+
+            // ===== MULAI GILIRAN DENGAN DADU =====
+            function startTurnWithDice(dice) {
+                if (gameOver || stepAnim.active || lineAnim.active) return;
+                const playerIdx = currentPlayer;
+                const start = players[playerIdx];
+                let intermediateEnd = start + dice;
+
+                // Jika melebihi 100, pantul
+                if (intermediateEnd > 100) {
+                    const remaining = intermediateEnd - 100;  // kelebihan langkah
+                    const finalTarget = 100 - remaining;      // posisi setelah mundur
+
+                    // Animasi maju ke 100 dulu
+                    startStepAnimation(playerIdx, start, 100, () => {
+                        // Lalu mundur ke finalTarget
+                        startStepAnimation(playerIdx, 100, finalTarget, () => {
+                            // Setelah sampai, cek ular/tangga & challenge
+                            handleSnakeOrLadder(playerIdx, finalTarget);
+                        });
+                    });
+                } else {
+                    // Normal (tidak melebihi)
+                    startStepAnimation(playerIdx, start, intermediateEnd, () => {
+                        handleSnakeOrLadder(playerIdx, intermediateEnd);
+                    });
+                }
+            }
+
+            // ===== UPDATE UI =====
+            function updateUI() {
+                const messageDiv = document.getElementById('message');
+                if (!gameOver) {
+                    messageDiv.innerText = diceValue ? `Pemain ${currentPlayer + 1} dapat ${diceValue}` : 'Klik dadu';
+                }
+                updatePosDisplay();
+            }
+
+            // ===== RESET GAME =====
+            function resetGame() {
+                stopAllAnimations();
+                players = [1, 1];
+                currentPlayer = 0;
+                gameOver = false;
+                diceValue = 0;
+                lastDiceValue = 0;
+                pendingChallenge = null;
+                challengeSquares.clear();
+                generateChallenges(20);
+                document.getElementById('diceBtn').disabled = false;
+                document.getElementById('diceBtn').innerText = '🎲';
+                document.getElementById('message').innerText = 'Klik dadu';
+                challengeImage.src = defaultImageSrc;
+                // Tutup popup jika aktif
+                popup.classList.remove('active');
+                updateUI();
+                drawBoard();
+            }
+
+            // ===== EVENT LISTENER =====
+            document.getElementById('diceBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (gameOver || stepAnim.active || lineAnim.active) return;
+
+                let count = 0;
+                const maxRolls = 10;
+                const diceSymbols = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+                let lastRand = 0;
+
+                const interval = setInterval(() => {
+                    const rand = Math.floor(Math.random() * 6) + 1;
+                    lastRand = rand;
+                    document.getElementById('diceBtn').innerText = diceSymbols[rand - 1];
+                    count++;
+                    if (count >= maxRolls) {
+                        clearInterval(interval);
+                        const finalDice = lastRand;
+                        diceValue = finalDice;
+                        lastDiceValue = finalDice;
+                        updateUI();
+                        startTurnWithDice(finalDice);
+                    }
+                }, 80);
+            });
+
+            document.getElementById('resetBtn').addEventListener('click', function(e) {
+                e.preventDefault();
+                resetGame();
+            });
+
+            // Aktifkan audio saat pertama kali berinteraksi
+            document.body.addEventListener('touchstart', () => {
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            }, { once: true });
+            document.body.addEventListener('click', () => {
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            }, { once: true });
+
+            // Mulai game
+            resetGame();
+        })();
+    </script>
+</body>
+</html>
+
